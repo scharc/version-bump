@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "version-bump"
+version = "0.1.2"
+description = "A tool for managing semantic versioning"
+authors = ["Marc Schütze <marc.schütze@zkm.de>"]
+license = "GPL-3.0"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.8,<3.14"
+click = "^8.1.8"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.4"
+pyinstaller = "^6.11.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
