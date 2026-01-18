@@ -1,0 +1,13 @@
+[package]
+name = "my-rust-project"
+version = "1.2.3"
+edition = "2021"
+license = "MIT"
+description = "A sample Rust project"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+tokio = { version = "1.0", features = ["full"] }
+
+[dev-dependencies]
+criterion = "0.5"
