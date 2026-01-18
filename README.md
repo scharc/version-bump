@@ -1,6 +1,6 @@
 # Version-Bump 🚀
 
-Version: **v0.1.3**
+Version: **v0.2.0**
 
 Are you tired of manually updating version numbers in your project? Sick of forgetting to tag releases in Git? Say no more—**Version-Bump** is here to save your day (and your sanity). This tool is slick, funny, and as gritty as your late-night coding sessions.
 
