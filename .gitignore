@@ -2,4 +2,7 @@ build
 dist
 *.lock
 __pycache__
-*.spec
+*.spec.agentbox/
+.agentbox.yml
+.claude/
+.mcp.json
