@@ -1,0 +1,18 @@
+2026-01-18 16:53:43 | INFO     | agentbox.container-client | Local IPC listening on /tmp/agentbox-local.sock
+2026-01-18 16:53:43 | INFO     | agentbox.ssh-tunnel | SSH tunnel client started
+2026-01-18 16:53:43 | INFO     | agentbox.container-client | Container client started for agentbox-version-bump
+2026-01-18 16:53:43 | INFO     | agentbox.ssh-tunnel | Connected to SSH server at /run/user/1000/agentboxd/ssh.sock
+2026-01-18 16:53:43 | INFO     | agentbox.ssh-tunnel | Control channel established
+2026-01-18 16:53:43 | INFO     | agentbox.container-client | Connected to agentboxd as agentbox-version-bump
+2026-01-23 07:44:33 | INFO     | agentbox.container-client | Local IPC listening on /tmp/agentbox-local.sock
+2026-01-23 07:44:33 | INFO     | agentbox.ssh-tunnel | SSH tunnel client started
+2026-01-23 07:44:33 | INFO     | agentbox.container-client | Container client started for agentbox-version-bump
+2026-01-23 07:44:33 | INFO     | agentbox.ssh-tunnel | Connected to SSH server at /run/user/1000/agentboxd/ssh.sock
+2026-01-23 07:44:33 | INFO     | agentbox.ssh-tunnel | Control channel established
+2026-01-23 07:44:33 | INFO     | agentbox.container-client | Connected to agentboxd as agentbox-version-bump
+2026-01-23 18:57:37 | ERROR    | agentbox.ssh-tunnel | Control channel loop error: Connection lost
+2026-01-23 18:57:37 | INFO     | agentbox.container-client | Disconnected from agentboxd
+2026-01-23 18:57:37 | INFO     | agentbox.ssh-tunnel | Connection lost, will reconnect...
+2026-01-23 18:57:38 | INFO     | agentbox.ssh-tunnel | Connected to SSH server at /run/user/1000/agentboxd/ssh.sock
+2026-01-23 18:57:38 | INFO     | agentbox.ssh-tunnel | Control channel established
+2026-01-23 18:57:38 | INFO     | agentbox.container-client | Connected to agentboxd as agentbox-version-bump

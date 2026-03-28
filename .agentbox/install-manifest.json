@@ -1,0 +1,17 @@
+{
+  "version": "1.0",
+  "last_updated": "2026-01-23T07:44:31.009731Z",
+  "installations": {
+    "pip": {
+      "fastmcp>=2.0.0": {
+        "installed": true,
+        "timestamp": "2026-01-23T07:44:31.009255Z",
+        "installed_version": "2.14.4",
+        "source": "/workspace/.agentbox/mcp-meta.json"
+      }
+    },
+    "npm": {},
+    "post": {}
+  },
+  "failures": []
+}

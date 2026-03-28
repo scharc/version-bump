@@ -1,0 +1,212 @@
+"""Handler for Dockerfile and docker-compose.yml version updates."""
+
+from __future__ import annotations
+
+import re
+from typing import TYPE_CHECKING
+
+from .base import FileHandler
+from ..exceptions import FileUpdateError
+
+if TYPE_CHECKING:
+    from ..version import Version
+
+
+# Match LABEL version="X.Y.Z" or LABEL version=X.Y.Z
+DOCKERFILE_VERSION_PATTERNS = [
+    re.compile(r'^LABEL\s+version\s*=\s*["\']?([^"\'"\s]+)["\']?', re.MULTILINE | re.IGNORECASE),
+    re.compile(r'^ARG\s+VERSION\s*=\s*["\']?([^"\'"\s]+)["\']?', re.MULTILINE | re.IGNORECASE),
+    re.compile(r'^ENV\s+VERSION\s*=\s*["\']?([^"\'"\s]+)["\']?', re.MULTILINE | re.IGNORECASE),
+]
+
+# Match version label in docker-compose
+COMPOSE_VERSION_PATTERN = re.compile(
+    r'(\s+version:\s*["\']?)(\d+\.\d+\.\d+)(["\']?)',
+    re.MULTILINE
+)
+
+# Match image tags like image: myapp:1.2.3
+COMPOSE_IMAGE_TAG_PATTERN = re.compile(
+    r'(image:\s*[^\s:]+:)(\d+\.\d+\.\d+)',
+    re.MULTILINE
+)
+
+
+class DockerfileHandler(FileHandler):
+    """Handler for Dockerfile version labels."""
+
+    filename = "Dockerfile"
+
+    def read_version(self) -> Version | None:
+        """Read the version from Dockerfile LABEL/ARG/ENV."""
+        if not self.exists():
+            return None
+
+        try:
+            content = self.file_path.read_text(encoding="utf-8")
+            for pattern in DOCKERFILE_VERSION_PATTERNS:
+                match = pattern.search(content)
+                if match:
+                    from ..version import Version
+                    return Version.from_string(match.group(1))
+        except (OSError, ValueError):
+            pass
+
+        return None
+
+    def write_version(self, version: Version) -> bool:
+        """Write the version to Dockerfile."""
+        if not self.exists():
+            return False
+
+        try:
+            content = self.file_path.read_text(encoding="utf-8")
+            updated = False
+
+            for pattern in DOCKERFILE_VERSION_PATTERNS:
+                if pattern.search(content):
+                    def replacer(m: re.Match[str]) -> str:
+                        original = m.group(0)
+                        # Determine the format used
+                        if 'LABEL' in original.upper():
+                            if '"' in original:
+                                return f'LABEL version="{version}"'
+                            elif "'" in original:
+                                return f"LABEL version='{version}'"
+                            return f'LABEL version={version}'
+                        elif 'ARG' in original.upper():
+                            return f'ARG VERSION={version}'
+                        elif 'ENV' in original.upper():
+                            return f'ENV VERSION={version}'
+                        return original
+
+                    content = pattern.sub(replacer, content)
+                    updated = True
+                    break
+
+            if updated:
+                self.file_path.write_text(content, encoding="utf-8")
+                return True
+            return False
+        except OSError as e:
+            raise FileUpdateError(self.filename, str(e)) from e
+
+
+class DockerComposeHandler(FileHandler):
+    """Handler for docker-compose.yml version updates."""
+
+    filename = "docker-compose.yml"
+
+    def read_version(self) -> Version | None:
+        """Read version from docker-compose.yml."""
+        if not self.exists():
+            return None
+
+        try:
+            content = self.file_path.read_text(encoding="utf-8")
+
+            # Try version label first
+            match = COMPOSE_VERSION_PATTERN.search(content)
+            if match:
+                from ..version import Version
+                return Version.from_string(match.group(2))
+
+            # Try image tag
+            match = COMPOSE_IMAGE_TAG_PATTERN.search(content)
+            if match:
+                from ..version import Version
+                return Version.from_string(match.group(2))
+        except (OSError, ValueError):
+            pass
+
+        return None
+
+    def write_version(self, version: Version) -> bool:
+        """Write version to docker-compose.yml."""
+        if not self.exists():
+            return False
+
+        try:
+            content = self.file_path.read_text(encoding="utf-8")
+            updated = False
+
+            # Update version labels
+            if COMPOSE_VERSION_PATTERN.search(content):
+                content = COMPOSE_VERSION_PATTERN.sub(
+                    rf'\g<1>{version}\g<3>',
+                    content
+                )
+                updated = True
+
+            # Update image tags
+            if COMPOSE_IMAGE_TAG_PATTERN.search(content):
+                content = COMPOSE_IMAGE_TAG_PATTERN.sub(
+                    rf'\g<1>{version}',
+                    content
+                )
+                updated = True
+
+            if updated:
+                self.file_path.write_text(content, encoding="utf-8")
+                return True
+            return False
+        except OSError as e:
+            raise FileUpdateError(self.filename, str(e)) from e
+
+
+class DockerComposeYamlHandler(FileHandler):
+    """Handler for docker-compose.yaml version updates (alternate extension)."""
+
+    filename = "docker-compose.yaml"
+
+    def read_version(self) -> Version | None:
+        """Read version from docker-compose.yaml."""
+        if not self.exists():
+            return None
+
+        try:
+            content = self.file_path.read_text(encoding="utf-8")
+
+            match = COMPOSE_VERSION_PATTERN.search(content)
+            if match:
+                from ..version import Version
+                return Version.from_string(match.group(2))
+
+            match = COMPOSE_IMAGE_TAG_PATTERN.search(content)
+            if match:
+                from ..version import Version
+                return Version.from_string(match.group(2))
+        except (OSError, ValueError):
+            pass
+
+        return None
+
+    def write_version(self, version: Version) -> bool:
+        """Write version to docker-compose.yaml."""
+        if not self.exists():
+            return False
+
+        try:
+            content = self.file_path.read_text(encoding="utf-8")
+            updated = False
+
+            if COMPOSE_VERSION_PATTERN.search(content):
+                content = COMPOSE_VERSION_PATTERN.sub(
+                    rf'\g<1>{version}\g<3>',
+                    content
+                )
+                updated = True
+
+            if COMPOSE_IMAGE_TAG_PATTERN.search(content):
+                content = COMPOSE_IMAGE_TAG_PATTERN.sub(
+                    rf'\g<1>{version}',
+                    content
+                )
+                updated = True
+
+            if updated:
+                self.file_path.write_text(content, encoding="utf-8")
+                return True
+            return False
+        except OSError as e:
+            raise FileUpdateError(self.filename, str(e)) from e

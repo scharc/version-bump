@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "agentctl": {
+      "type": "sse",
+      "url": "http://127.0.0.1:9100/sse"
+    },
+    "agentbox-analyst": {
+      "command": "python3",
+      "args": [
+        "/workspace/.agentbox/mcp/agentbox-analyst/server.py"
+      ]
+    }
+  }
+}

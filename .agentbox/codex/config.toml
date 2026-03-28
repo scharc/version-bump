@@ -1,0 +1,29 @@
+model = "gpt-5-codex"
+sandbox_mode = "workspace-write"
+approval_policy = "on-request"
+
+[features]
+parallel = true
+shell_snapshot = true
+unified_exec = true
+web_search_request = false
+undo = true
+skills = true
+shell_tool = true
+view_image_tool = true
+
+[projects."/workspace"]
+trust_level = "trusted"
+
+[projects."/context"]
+trust_level = "trusted"
+
+[mcp_servers.agentctl]
+command = "python3"
+args = [ "/workspace/.agentbox/mcp/agentctl/server_fastmcp.py",]
+
+[mcp_servers.agentbox-analyst]
+command = "python3"
+args = [ "/workspace/.agentbox/mcp/agentbox-analyst/server.py",]
+
+[mcp_servers.agentctl.env]

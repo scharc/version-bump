@@ -1,0 +1,140 @@
+"""File handler registry for version updates."""
+
+from __future__ import annotations
+
+from pathlib import Path
+from typing import TYPE_CHECKING
+
+from .base import FileHandler
+from .cargo import CargoHandler
+from .composer import ComposerHandler
+from .gradle import GradleHandler, GradleKtsHandler
+from .helm import HelmChartHandler
+from .maven import MavenHandler
+from .mix import MixHandler
+from .package_json import PackageJsonHandler
+from .pubspec import PubspecHandler
+from .pyproject import PyprojectHandler
+from .python_version import DunderVersionHandler, VersionPyHandler
+from .readme import ReadmeHandler
+from .setup_cfg import SetupCfgHandler
+from .setup_py import SetupPyHandler
+from .version_file import VersionFileHandler, VersionTxtHandler
+
+if TYPE_CHECKING:
+    from ..version import Version
+
+__all__ = [
+    "CargoHandler",
+    "ComposerHandler",
+    "DunderVersionHandler",
+    "FileHandler",
+    "GradleHandler",
+    "GradleKtsHandler",
+    "HelmChartHandler",
+    "MavenHandler",
+    "MixHandler",
+    "PackageJsonHandler",
+    "PubspecHandler",
+    "PyprojectHandler",
+    "ReadmeHandler",
+    "SetupCfgHandler",
+    "SetupPyHandler",
+    "VersionFileHandler",
+    "VersionPyHandler",
+    "VersionTxtHandler",
+    "get_all_handlers",
+    "get_current_version",
+    "update_all_files",
+]
+
+
+def get_all_handlers(base_path: Path | None = None) -> list[FileHandler]:
+    """Get all available file handlers.
+
+    Args:
+        base_path: The directory containing the files. Defaults to current directory.
+
+    Returns:
+        A list of all file handler instances.
+    """
+    return [
+        # Primary version sources (checked first for reading)
+        PyprojectHandler(base_path),
+        PackageJsonHandler(base_path),
+        CargoHandler(base_path),
+        ComposerHandler(base_path),
+        PubspecHandler(base_path),
+        HelmChartHandler(base_path),
+        MavenHandler(base_path),
+        GradleHandler(base_path),
+        GradleKtsHandler(base_path),
+        MixHandler(base_path),
+        SetupCfgHandler(base_path),
+        SetupPyHandler(base_path),
+        # Version files
+        VersionFileHandler(base_path),
+        VersionTxtHandler(base_path),
+        DunderVersionHandler(base_path),
+        VersionPyHandler(base_path),
+        # Documentation
+        ReadmeHandler(base_path),
+    ]
+
+
+def get_current_version(base_path: Path | None = None) -> Version | None:
+    """Get the current version from available files.
+
+    Checks version sources in priority order.
+
+    Args:
+        base_path: The directory containing the files. Defaults to current directory.
+
+    Returns:
+        The Version object if found, None if no version found.
+    """
+    # Priority order for reading version
+    handlers = [
+        PyprojectHandler(base_path),
+        PackageJsonHandler(base_path),
+        CargoHandler(base_path),
+        ComposerHandler(base_path),
+        PubspecHandler(base_path),
+        HelmChartHandler(base_path),
+        MavenHandler(base_path),
+        GradleHandler(base_path),
+        GradleKtsHandler(base_path),
+        MixHandler(base_path),
+        SetupCfgHandler(base_path),
+        SetupPyHandler(base_path),
+        VersionFileHandler(base_path),
+        VersionTxtHandler(base_path),
+        DunderVersionHandler(base_path),
+        VersionPyHandler(base_path),
+    ]
+
+    for handler in handlers:
+        version = handler.read_version()
+        if version is not None:
+            return version
+
+    return None
+
+
+def update_all_files(version: Version, base_path: Path | None = None) -> list[str]:
+    """Update version in all available files.
+
+    Args:
+        version: The Version object to write.
+        base_path: The directory containing the files. Defaults to current directory.
+
+    Returns:
+        A list of filenames that were successfully updated.
+    """
+    updated_files: list[str] = []
+
+    for handler in get_all_handlers(base_path):
+        if handler.write_version(version):
+            updated_files.append(handler.filename)
+
+    return updated_files

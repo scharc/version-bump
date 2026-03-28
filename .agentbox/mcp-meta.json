@@ -1,0 +1,39 @@
+{
+  "servers": {
+    "agentctl": {
+      "config": {
+        "command": "python3",
+        "args": [
+          "/workspace/.agentbox/mcp/agentctl/server_fastmcp.py"
+        ],
+        "env": {}
+      },
+      "install": {
+        "pip": [
+          "fastmcp>=2.0.0"
+        ]
+      },
+      "commands": [
+        "context"
+      ]
+    },
+    "agentbox-analyst": {
+      "config": {
+        "command": "python3",
+        "args": [
+          "/workspace/.agentbox/mcp/agentbox-analyst/server.py"
+        ]
+      },
+      "install": {
+        "pip": [
+          "fastmcp>=2.0.0"
+        ]
+      },
+      "commands": [
+        "consult",
+        "review",
+        "verify"
+      ]
+    }
+  }
+}
